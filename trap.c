@@ -47,9 +47,16 @@ trap(struct trapframe *tf)
   }
 
   switch(tf->trapno){
-  case T_PGFLT:
-	struct proc *curproc = myproc();
-	allocuvm(pgdir, TOPSTACK - PGSIZE - (curproc->stack_pages * PGSIZE), TOPSTACK - curproc->stack_pages * PGSIZE)
+  case T_PGFLT: ;
+	uint newsz = TOPSTACK - (myproc()->stack_pages * PGSIZE);
+	uint oldsz = newsz - PGSIZE;
+ 	 if(allocuvm(myproc()->pgdir, oldsz, newsz) == 0){
+		break;
+  	}
+  	myproc()->stack_pages++;
+  	switchuvm(myproc());
+  	break;
+
   case T_IRQ0 + IRQ_TIMER:
     if(cpuid() == 0){
       acquire(&tickslock);
