@@ -50,7 +50,7 @@ trap(struct trapframe *tf)
   case T_PGFLT: ;
 	uint newsz = TOPSTACK - (myproc()->stack_pages * PGSIZE);
 	uint oldsz = newsz - PGSIZE;
-	if(rcr2() > oldsz - PGSIZE || rcr2() < newsz){
+	if(rcr2() > oldsz - PGSIZE && rcr2() < newsz){
  	    if(allocuvm(myproc()->pgdir, oldsz, newsz) == 0){
 		    break;
   	    }
