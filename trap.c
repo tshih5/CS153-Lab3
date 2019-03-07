@@ -47,6 +47,9 @@ trap(struct trapframe *tf)
   }
 
   switch(tf->trapno){
+  case T_PGFLT:
+	struct proc *curproc = myproc();
+	allocuvm(pgdir, TOPSTACK - PGSIZE - (curproc->stack_pages * PGSIZE), TOPSTACK - curproc->stack_pages * PGSIZE)
   case T_IRQ0 + IRQ_TIMER:
     if(cpuid() == 0){
       acquire(&tickslock);

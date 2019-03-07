@@ -138,7 +138,7 @@ userinit(void)
   p->tf->eflags = FL_IF;
   p->tf->esp = PGSIZE;
   p->tf->eip = 0;  // beginning of initcode.S
-  p->top_stack = 0; //set top of the stack to 0;
+  p->stack_pages = 0; //set top of the stack to 0;
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
@@ -190,7 +190,7 @@ fork(void)
   }
 
   // Copy process state from proc.
-  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->top_stack)) == 0){
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->stack_pages)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;

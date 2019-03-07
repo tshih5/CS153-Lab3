@@ -313,7 +313,7 @@ clearpteu(pde_t *pgdir, char *uva)
 // Given a parent process's page table, create a copy
 // of it for a child.
 pde_t*
-copyuvm(pde_t *pgdir, uint sz, uint top_stack)
+copyuvm(pde_t *pgdir, uint sz, uint stack_pages)
 {
   pde_t *d;
   pte_t *pte;
@@ -322,11 +322,12 @@ copyuvm(pde_t *pgdir, uint sz, uint top_stack)
 
   if((d = setupkvm()) == 0)
     return 0;
+    
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
-      panic("copyuvm: pte should exist");
+      panic("copyuvm: pte should exist 1");
     if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
+      panic("copyuvm: page not present 1");
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
@@ -337,11 +338,11 @@ copyuvm(pde_t *pgdir, uint sz, uint top_stack)
   }
   //Copied from above
   
-  for(i = top_stack; i < KERNBASE; i += PGSIZE){
+  for(i = TOPSTACK - (stack_pages * PGSIZE); i < TOPSTACK; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
-      panic("copyuvm: pte should exist");
+      panic("copyuvm: pte should exist 2");
     if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
+      panic("copyuvm: page not present 2");
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
